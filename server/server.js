@@ -70,6 +70,26 @@ fastify.post("/api/fetch-posts", async (request) => {
   }
 });
 
+// Get cache statistics
+fastify.get("/api/cache-stats", async () => {
+  try {
+    const count = getPostsCount();
+    return { cachedPosts: count };
+  } catch (error) {
+    throw error;
+  }
+});
+
+// Clear cache
+fastify.delete("/api/cache", async () => {
+  try {
+    deletePosts();
+    return { message: "Cache cleared successfully" };
+  } catch (error) {
+    throw error;
+  }
+});
+
 // Server Lifecycle
 async function start() {
   try {

@@ -7,6 +7,7 @@ import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { useRedditData } from "@/hooks/useRedditData";
 import { Button } from "@/components/ui/button";
 import { Trash2, BookOpen, Filter } from "lucide-react";
+import axios from "axios";
 
 export default function App() {
   const {
@@ -26,6 +27,7 @@ export default function App() {
     allPostsCount,
   } = useRedditData();
 
+  const [cacheSize, setCacheSize] = useState(0);
   const [showFilters, setShowFilters] = useState(true);
 
   // Calculate columns based on viewport
@@ -38,11 +40,36 @@ export default function App() {
 
   const [columns, setColumns] = useState(getColumnCount());
 
+  // Get cache size from server and setup resize listener
   useEffect(() => {
+    async function fetchCacheStats() {
+      try {
+        const response = await axios.get("http://localhost:3000/api/cache-stats");
+        setCacheSize(response.data.cachedPosts);
+      } catch (error) {
+        console.error("Error fetching cache stats:", error);
+      }
+    }
+
+    fetchCacheStats();
+
     const handleResize = () => setColumns(getColumnCount());
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  async function handleClearCache() {
+    if (confirm("Are you sure you want to clear all cached data?")) {
+      try {
+        await axios.delete("http://localhost:3000/api/cache");
+        setCacheSize(0);
+        window.location.reload();
+      } catch (error) {
+        console.error("Error clearing cache:", error);
+        alert("Failed to clear cache");
+      }
+    }
+  }
 
   if (error) {
     return (
@@ -86,6 +113,12 @@ export default function App() {
                   <Filter size={16} />
                   {showFilters ? "Hide" : "Show"} Filters
                 </Button>
+                {cacheSize > 0 && (
+                  <Button variant="outline" size="sm" onClick={handleClearCache} className="gap-2">
+                    <Trash2 size={16} />
+                    Clear Cache ({cacheSize})
+                  </Button>
+                )}
               </div>
             </div>
 
