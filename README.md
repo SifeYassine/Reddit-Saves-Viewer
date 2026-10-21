@@ -2,6 +2,10 @@
 
 A fast, searchable web app for browsing your **saved Reddit posts**. Load a CSV of saved post URLs and get a masonry feed of cards with titles, text, images, galleries, and videos, with fuzzy search, subreddit filters, and pagination. A small **Fastify** backend fetches post data from Reddit in batches and caches it in **SQLite**, so each post is only downloaded once.
 
+![Feed](screenshots/feed.jpg)
+
+![Subreddit filter](screenshots/subreddit-filter.jpg)
+
 ## Features
 
 - **Masonry feed** with responsive columns (1–4 depending on screen width)
